@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import cucumber.api.DataTable;
@@ -42,5 +43,59 @@ public class GuruLogin {
 		Assert.assertEquals("",driver.findElement(By.name("uid")).getAttribute("Value"));
 		Assert.assertEquals("",driver.findElement(By.name("password")).getAttribute("Value"));
 	}
+
+	@Given("^The user logged in as manager$")
+	public void the_user_logged_in_as_manager(DataTable credentials) throws Throwable {
+		List<Map<String, String>> credentialMaps = credentials.asMaps(String.class, String.class);
+		driver.findElement(By.name("uid")).sendKeys(credentialMaps.get(0).get("mngrid"));
+		driver.findElement(By.name("password")).sendKeys(credentialMaps.get(0).get("mngrpass"));
+		driver.findElement(By.name("btnLogin")).click();
+	}
+
+	@Given("^The user navigates to new customer page$")
+	public void the_user_navigates_to_new_customer_page() throws Throwable {
+		driver.findElement(By.xpath("//a[text()='New Customer']")).click();	
+	}
+
+	@When("^The user enters the customer details with \"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\",\"([^\"]*)\"$")
+	public void the_user_enters_the_customer_details_with(String custname, String gender, String dob, String address, String city, String state, String pin, String phno, String email, String pass) throws Throwable {
+		driver.findElement(By.name("name")).sendKeys(custname);
+		if(gender.equals("male")) {
+		driver.findElement(By.xpath("//input[@type='radio' and @value='m']")).click();
+		} else if(gender.equals("female")) {
+			driver.findElement(By.xpath("//input[@type='radio' and @value='f']")).click();
+		}
+		driver.findElement(By.name("dob")).sendKeys(dob);
+		driver.findElement(By.name("addr")).sendKeys(address);
+		driver.findElement(By.name("city")).sendKeys(city);
+		driver.findElement(By.name("state")).sendKeys(state);
+		driver.findElement(By.name("pinno")).sendKeys(pin);
+		driver.findElement(By.name("telephoneno")).sendKeys(phno);
+		driver.findElement(By.name("emailid")).sendKeys(email);
+		driver.findElement(By.name("password")).sendKeys(pass);
+		
+	}
+
+	@When("^The user submits the form$")
+	public void the_user_submits_the_form() throws Throwable {
+		driver.findElement(By.name("sub")).click();
+	
+	}
+
+	@Then("^The user should see the success message$")
+	public void the_user_should_see_the_success_message() throws Throwable {
+		Assert.assertTrue(driver.getCurrentUrl().contains("Customer"));
+		Assert.assertTrue(driver.findElement(By.xpath("//p[contains(text(),'Registered')]")).getText().contains("Successfully"));
+		List<WebElement> tRows= driver.findElements(By.tagName("tr"));
+		String custID = tRows.get(4).getText();
+		System.out.println(custID);
+		//for (WebElement rows:tRows) {
+			//List<WebElement> tData=driver.findElements(By.tagName("td"));
+			//if (t)
+			
+		//}
+	}
+	
+
 
 }
